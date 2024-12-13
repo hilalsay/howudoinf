@@ -6,12 +6,8 @@ export default function Index() {
   return (
     <View>
       <Text>Welcome to the App</Text>
-      <Link href={"./login"}>
-        <Button title="Go to Login" />
-      </Link>
-      <Link href={"./signup"}>
-        <Button title="Go to Signup" />
-      </Link>
+      <Link href={"./login"}>Go to Login</Link>
+      <Link href={"./signup"}>Go to Signup</Link>
     </View>
   );
 }
