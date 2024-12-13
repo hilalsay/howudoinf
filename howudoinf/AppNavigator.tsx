@@ -5,6 +5,7 @@ import LoginScreen from "./app/login";
 import SignupScreen from "./app/signup";
 import LandingScreen from "./app/landing";
 import Messages from "./app/messages";
+import Friends from "./app/friends";
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ export default function AppNavigator() {
       <Stack.Screen name="Signup" component={SignupScreen} />
       <Stack.Screen name="Landing" component={LandingScreen} />
       <Stack.Screen name="Messages" component={Messages} />
+      <Stack.Screen name="Friends" component={Friends} />
     </Stack.Navigator>
   );
 }

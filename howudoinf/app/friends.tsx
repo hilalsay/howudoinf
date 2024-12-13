@@ -8,11 +8,13 @@ import {
   TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router"; // Import useRouter
 
-export default function Friends({ navigation }: any) {
+export default function Friends() {
   const [friends, setFriends] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter(); // Use useRouter for navigation
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -55,12 +57,17 @@ export default function Friends({ navigation }: any) {
   }, []);
 
   const handleFriendPress = async (friendEmail: string) => {
+    if (!friendEmail) {
+      console.error("Friend email is undefined or null");
+      return;
+    }
+
     try {
       // Store the friend's email in AsyncStorage
       await AsyncStorage.setItem("friendEmail", friendEmail);
 
-      // Navigate to the messages screen
-      navigation.navigate("Messages");
+      // Navigate to the messages screen using router.push
+      router.push("/messages"); // Update with your route to messages
     } catch (error) {
       console.error("Failed to store friend's email", error);
     }
@@ -89,7 +96,7 @@ export default function Friends({ navigation }: any) {
       {friends.length > 0 ? (
         <FlatList
           data={friends}
-          keyExtractor={(item, index) => item._id || index.toString()}
+          keyExtractor={(item, index) => item || index.toString()}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => handleFriendPress(item)}>
               <View style={styles.friendItem}>
