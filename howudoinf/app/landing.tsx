@@ -1,35 +1,48 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Button } from "react-native";
-import { Link } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
 export default function Landing() {
-  const [userName, setUserName] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  // Simulating fetching user data (e.g., from a login response)
   useEffect(() => {
-    setUserName("John Doe"); // Replace with actual data fetching logic
+    // Fetch the token from AsyncStorage when the component mounts
+    const fetchToken = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem("authToken");
+        if (storedToken) {
+          setToken(storedToken); // Set the token if found
+        } else {
+          setError("No token found. Please login again.");
+        }
+      } catch (err) {
+        setError("Failed to retrieve token.");
+      }
+    };
+
+    fetchToken();
   }, []);
 
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 20,
-      }}
-    >
-      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>
-        Welcome {userName ? userName : "User"}!
-      </Text>
-      <Text style={{ fontSize: 16, marginBottom: 20 }}>
-        You have successfully logged in!
-      </Text>
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("authToken"); // Clear the token from AsyncStorage
+      router.push("/login"); // Navigate back to the login page
+    } catch (err) {
+      setError("Failed to logout.");
+    }
+  };
 
-      {/* Example Link to navigate to another page (e.g., profile) */}
-      {/* <Link href="/profile">
-        <Button title="Go to Profile" />
-      </Link> */}
+  return (
+    <View style={{ padding: 20 }}>
+      {error ? (
+        <Text style={{ color: "red" }}>{error}</Text>
+      ) : (
+        <Text>Welcome! Your token is: {token}</Text>
+      )}
+      <Button title="Logout" onPress={handleLogout} />
     </View>
   );
 }
