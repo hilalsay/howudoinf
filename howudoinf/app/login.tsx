@@ -45,9 +45,10 @@ export default function Login() {
       const token = typeof data === "string" ? data : data.token;
 
       if (token) {
-        // Save the token in AsyncStorage
+        // Save the token and email in AsyncStorage
         await AsyncStorage.setItem("authToken", token);
-        console.log("Login successful, token saved.");
+        await AsyncStorage.setItem("userEmail", email); // Save the email
+        console.log("Login successful, token and email saved.");
 
         // Navigate to the landing page after successful login
         router.push("/landing"); // Directs to the Landing page
