@@ -4,7 +4,7 @@ import { View, Text, Button, StyleSheet } from "react-native";
 export default function WelcomeScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to the React Native App</Text>
+      <Text style={styles.title}>Welcome to the Howudoin App</Text>
       <Button title="Login" onPress={() => navigation.navigate("Login")} />
       <Button title="Signup" onPress={() => navigation.navigate("Signup")} />
     </View>

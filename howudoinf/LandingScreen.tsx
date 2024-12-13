@@ -1,22 +1,35 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Button } from "react-native";
+import { Link } from "expo-router";
 
-export default function LandingScreen() {
+export default function Landing() {
+  const [userName, setUserName] = useState<string | null>(null);
+
+  // Simulating fetching user data (e.g., from a login response)
+  useEffect(() => {
+    setUserName("John Doe"); // Replace with actual data fetching logic
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to the Landing Page</Text>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 20,
+      }}
+    >
+      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>
+        Welcome {userName ? userName : "User"}!
+      </Text>
+      <Text style={{ fontSize: 16, marginBottom: 20 }}>
+        You have successfully logged in!
+      </Text>
+
+      {/* Example Link to navigate to another page (e.g., profile) */}
+      {/* <Link href="/profile">
+        <Button title="Go to Profile" />
+      </Link> */}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-});
