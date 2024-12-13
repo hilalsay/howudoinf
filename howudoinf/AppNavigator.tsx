@@ -8,6 +8,8 @@ import Messages from "./app/messages";
 import Friends from "./app/friends";
 import Groups from "./app/groups";
 import GroupDetails from "./app/group_detail";
+import AddFriend from "./app/addfriend";
+import FriendRequests from "./app/friendRequests";
 
 const Stack = createStackNavigator();
 
@@ -22,6 +24,8 @@ export default function AppNavigator() {
       <Stack.Screen name="Friends" component={Friends} />
       <Stack.Screen name="Groups" component={Groups} />
       <Stack.Screen name="GroupDetails" component={GroupDetails} />
+      <Stack.Screen name="addFriend" component={AddFriend} />
+      <Stack.Screen name="friendRequests" component={FriendRequests} />
     </Stack.Navigator>
   );
 }
