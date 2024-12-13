@@ -7,9 +7,7 @@ export default function Login() {
     <View>
       <Text>Login Screen</Text>
       {/* Use the correct string path format */}
-      <Link href={"./landing"}>
-        <Button title="Go to Landing Page" />
-      </Link>
+      <Link href={"./landing"}>Go to Landing Page</Link>
     </View>
   );
 }
