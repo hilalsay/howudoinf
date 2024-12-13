@@ -73,6 +73,11 @@ export default function Friends() {
     }
   };
 
+  // Navigate to Friend Requests page
+  const navigateToFriendRequests = () => {
+    router.push("/friendRequests"); // Navigate to the friend requests page
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -93,6 +98,16 @@ export default function Friends() {
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Your Friends:</Text>
+
+      {/* Button to navigate to Friend Requests */}
+      <TouchableOpacity onPress={navigateToFriendRequests}>
+        <Text style={styles.addFriendLink}>Go to Friend Requests</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => router.push("/addFriend")}>
+        <Text style={styles.addFriendLink}>Add a New Friend</Text>
+      </TouchableOpacity>
+
       {friends.length > 0 ? (
         <FlatList
           data={friends}
@@ -122,6 +137,12 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 20,
     fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  addFriendLink: {
+    fontSize: 16,
+    color: "#007BFF",
     textAlign: "center",
     marginBottom: 20,
   },
