@@ -7,7 +7,7 @@ import LandingScreen from "./app/landing";
 import Messages from "./app/messages";
 import Friends from "./app/friends";
 import Groups from "./app/groups";
-import GroupDetails from "./app/group_detail";
+import GroupDetails from "./app/groupdetails";
 import AddFriend from "./app/addfriend";
 import FriendRequests from "./app/friendRequests";
 

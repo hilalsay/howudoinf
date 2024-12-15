@@ -6,6 +6,9 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
+  TextInput,
+  Button,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
@@ -21,6 +24,9 @@ const Groups: React.FC = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState<boolean>(false); // Toggle for showing the form
+  const [newGroupName, setNewGroupName] = useState<string>(""); // New group name
+  const [newGroupMembers, setNewGroupMembers] = useState<string>(""); // New group members (comma-separated)
   const router = useRouter();
 
   useEffect(() => {
@@ -44,7 +50,6 @@ const Groups: React.FC = () => {
         }
 
         const data: Group[] = await response.json();
-       
         setGroups(data); // Store the fetched groups
       } catch (error: any) {
         setError(error.message || "An unexpected error occurred.");
@@ -73,6 +78,42 @@ const Groups: React.FC = () => {
     }
   };
 
+  const handleCreateGroup = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        throw new Error("User is not authenticated.");
+      }
+
+      const membersArray = newGroupMembers.split(",").map((member) => member.trim());
+
+      const response = await fetch("http://10.0.2.2:8080/groups/create", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: newGroupName,
+          members: membersArray,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create the group.");
+      }
+
+      const createdGroup: Group = await response.json();
+      setGroups((prevGroups) => [...prevGroups, createdGroup]); // Add the new group to the list
+      setShowCreateForm(false); // Hide the form
+      setNewGroupName(""); // Reset the form
+      setNewGroupMembers("");
+      Alert.alert("Success", "Group created successfully!");
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to create the group.");
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -93,6 +134,32 @@ const Groups: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Groups:</Text>
+
+      {/* Button to toggle the create group form */}
+      <Button
+        title={showCreateForm ? "Cancel" : "Create Group"}
+        onPress={() => setShowCreateForm(!showCreateForm)}
+      />
+
+      {/* Group creation form */}
+      {showCreateForm && (
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Group Name"
+            value={newGroupName}
+            onChangeText={setNewGroupName}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Members (comma-separated)"
+            value={newGroupMembers}
+            onChangeText={setNewGroupMembers}
+          />
+          <Button title="Create Group" onPress={handleCreateGroup} />
+        </View>
+      )}
+
       <FlatList
         data={groups}
         keyExtractor={(item) => item.id}
@@ -145,6 +212,17 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 16,
     textAlign: "center",
+  },
+  form: {
+    marginVertical: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: "#fff",
   },
 });
 

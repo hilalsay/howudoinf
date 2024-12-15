@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Button } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
 type Group = {
   id: string;
@@ -11,6 +12,7 @@ type Group = {
 
 const GroupDetails: React.FC = () => {
   const [group, setGroup] = useState<Group | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchGroupDetails = async () => {
@@ -27,6 +29,20 @@ const GroupDetails: React.FC = () => {
 
     fetchGroupDetails();
   }, []);
+
+  const handleGoToChat = async () => {
+    if (!group) return;
+
+    try {
+      // Save the current group details to AsyncStorage
+      await AsyncStorage.setItem("currentGroup", JSON.stringify(group));
+
+      // Navigate to the GroupChat page
+      router.push("/groupchat");
+    } catch (error) {
+      console.error("Failed to navigate to group chat", error);
+    }
+  };
 
   if (!group) {
     return (
@@ -47,6 +63,7 @@ const GroupDetails: React.FC = () => {
           {member}
         </Text>
       ))}
+      <Button title="Go to Group Chat" onPress={handleGoToChat} />
     </View>
   );
 };
