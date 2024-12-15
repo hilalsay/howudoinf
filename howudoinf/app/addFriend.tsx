@@ -151,30 +151,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f9f9f9",
-    justifyContent: "center",
+    backgroundColor: "#ccccff", // Light purple background
   },
   headerText: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: "bold",
+    color: "#6a0dad", // Consistent purple header
     textAlign: "center",
     marginBottom: 20,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
+    borderColor: "#6a0dad", // Purple border
+    padding: 15,
+    borderRadius: 25,
+    backgroundColor: "#fff",
+    color: "#333",
     marginBottom: 20,
+    fontSize: 16,
+    elevation: 2,
   },
   addButton: {
-    backgroundColor: "#007BFF",
-    padding: 15,
-    borderRadius: 5,
+    backgroundColor: "#6a0dad", // Consistent purple button
+    paddingVertical: 15,
+    borderRadius: 25,
     alignItems: "center",
+    elevation: 3,
+    marginTop: 10,
   },
   addButtonText: {
     color: "#fff",
+    fontSize: 18,
     fontWeight: "bold",
   },
   errorText: {
@@ -184,21 +191,28 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loadingText: {
-    fontSize: 16,
-    color: "#333",
+    fontSize: 18,
+    color: "#6a0dad",
     textAlign: "center",
+    marginVertical: 10,
   },
   searchResult: {
     padding: 15,
-    backgroundColor: "#e0e0e0",
-    borderRadius: 5,
+    backgroundColor: "#f3e8ff", // Light purple for result box
+    borderRadius: 15,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#6a0dad",
+    elevation: 2,
   },
   selectedResult: {
-    backgroundColor: "#007BFF", // Highlight the selected friend's result
+    backgroundColor: "#d1b3ff", // Brighter purple for selected results
+    borderWidth: 2,
+    borderColor: "#6a0dad",
   },
   resultText: {
-    fontSize: 16,
+    fontSize: 18,
     color: "#333",
+    fontWeight: "500",
   },
 });

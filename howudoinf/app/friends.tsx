@@ -8,13 +8,13 @@ import {
   TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router"; // Import useRouter
+import { useRouter } from "expo-router";
 
 export default function Friends() {
   const [friends, setFriends] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter(); // Use useRouter for navigation
+  const router = useRouter();
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -40,12 +40,7 @@ export default function Friends() {
         }
 
         const data = await response.json();
-
-        if (Array.isArray(data)) {
-          setFriends(data);
-        } else {
-          setFriends([]);
-        }
+        setFriends(Array.isArray(data) ? data : []);
       } catch (err: any) {
         setError(err.message || "An unexpected error occurred.");
       } finally {
@@ -57,57 +52,32 @@ export default function Friends() {
   }, []);
 
   const handleFriendPress = async (friendEmail: string) => {
-    if (!friendEmail) {
-      console.error("Friend email is undefined or null");
-      return;
-    }
-
     try {
-      // Store the friend's email in AsyncStorage
       await AsyncStorage.setItem("friendEmail", friendEmail);
-
-      // Navigate to the messages screen using router.push
-      router.push("/messages"); // Update with your route to messages
+      router.push("/messages");
     } catch (error) {
       console.error("Failed to store friend's email", error);
     }
   };
 
-  // Navigate to Friend Requests page
   const navigateToFriendRequests = () => {
-    router.push("/friendRequests"); // Navigate to the friend requests page
+    router.push("/friendRequests");
   };
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#6a0dad" />
         <Text style={styles.loadingText}>Loading friends...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>{error}</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Your Friends:</Text>
+      <Text style={styles.headerText}>Your Friends</Text>
 
-      {/* Button to navigate to Friend Requests */}
-      <TouchableOpacity onPress={navigateToFriendRequests}>
-        <Text style={styles.addFriendLink}>Go to Friend Requests</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => router.push("/addFriend")}>
-        <Text style={styles.addFriendLink}>Add a New Friend</Text>
-      </TouchableOpacity>
-
+      {/* Friends List */}
       {friends.length > 0 ? (
         <FlatList
           data={friends}
@@ -119,10 +89,21 @@ export default function Friends() {
               </View>
             </TouchableOpacity>
           )}
+          contentContainerStyle={styles.friendList}
         />
       ) : (
         <Text style={styles.noFriendsText}>You have no friends yet.</Text>
       )}
+
+      {/* Buttons Fixed at Bottom */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={navigateToFriendRequests}>
+          <Text style={styles.buttonText}>Go to Friend Requests</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/addFriend")}>
+          <Text style={styles.buttonText}>Add a New Friend</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -130,48 +111,66 @@ export default function Friends() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#ccccff",
     padding: 20,
-    backgroundColor: "#f9f9f9",
+  },
+  loadingContainer: {
+    flex: 1,
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f9f9f9",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#6a0dad",
   },
   headerText: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  addFriendLink: {
-    fontSize: 16,
-    color: "#007BFF",
+    color: "#6a0dad",
     textAlign: "center",
     marginBottom: 20,
   },
   friendItem: {
-    backgroundColor: "#e0e0e0",
+    backgroundColor: "#E8EAF6", // Light purple box
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
+    alignItems: "center",
+    elevation: 2,
   },
   friendText: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#333",
-  },
-  errorText: {
-    color: "red",
-    fontSize: 16,
-    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000", // Black text for names
   },
   noFriendsText: {
-    fontSize: 16,
-    color: "#666",
+    fontSize: 18,
+    color: "#6a0dad",
     textAlign: "center",
     marginTop: 20,
   },
-  loadingText: {
-    fontSize: 16,
-    color: "#333",
-    textAlign: "center",
-    marginTop: 10,
+  buttonContainer: {
+    position: "absolute", // Fixed at the bottom
+    bottom: 20,
+    left: 20,
+    right: 20,
+  },
+  button: {
+    backgroundColor: "#6a0dad",
+    paddingVertical: 12,
+    borderRadius: 30, // Rounder buttons
+    alignItems: "center",
+    marginBottom: 10,
+    elevation: 3,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  friendList: {
+    paddingBottom: 150, // Ensure content does not overlap with buttons
   },
 });

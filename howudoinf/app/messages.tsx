@@ -149,15 +149,11 @@ export default function Messages() {
                     isSender ? styles.senderMessage : styles.receiverMessage,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.messageText,
-                      isSender ? styles.senderText : styles.receiverText,
-                    ]}
-                  >
-                    {item.content}
-                  </Text>
-                </View>
+                     {!isSender && (
+        <Text style={styles.senderEmail}>{item.senderEmail}</Text>
+      )}
+      <Text style={styles.messageText}>{item.content}</Text>
+    </View>
               );
             }}
           />
@@ -185,82 +181,81 @@ export default function Messages() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ccccff", // Light lavender background
+    padding: 10,
   },
   headerText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
+    color: "#6a0dad", // Purple text
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   messagesContainer: {
-    flex: 1, // Take up available space
-    marginBottom: 20, // Add space above the input area
+    flexGrow: 1,
+    paddingBottom: 10,
   },
   messageItem: {
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    maxWidth: "80%", // Limit message width
+    borderRadius: 20,
+    padding: 10,
+    marginVertical: 5,
+    maxWidth: "75%", // Messages won't span full width
+    elevation: 3, // Shadow for depth
   },
   senderMessage: {
-    backgroundColor: "#d0f0c0", // Light green for sender
-    alignSelf: "flex-end", // Align sender messages to the right
+    backgroundColor: "#f2f2f2", // Light gray for sender
+    alignSelf: "flex-end", // Align to the right
   },
   receiverMessage: {
-    backgroundColor: "#f0f0f0", // Light gray for receiver
-    alignSelf: "flex-start", // Align receiver messages to the left
+    backgroundColor: "#e0e0eb", // Light purple for receiver
+    alignSelf: "flex-start", // Align to the left
+  },
+  senderEmail: {
+    fontSize: 14,
+    color: "#6a0dad", // Purple for sender email
+    fontWeight: "600",
+    marginBottom: 2,
+    textAlign: "right",
   },
   messageText: {
     fontSize: 16,
-    color: "#333",
-  },
-  senderText: {
-    textAlign: "right", // Align text to the right for sender
-  },
-  receiverText: {
-    textAlign: "left", // Align text to the left for receiver
-  },
-  errorText: {
-    color: "red",
-    fontSize: 16,
-    textAlign: "center",
+    color: "#333", // Darker text color for message content
   },
   noMessagesText: {
     fontSize: 16,
-    color: "#666",
+    color: "#6a0dad", // Purple for no messages
     textAlign: "center",
     marginTop: 20,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: "#333",
-    textAlign: "center",
-    marginTop: 10,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
+    paddingVertical: 10,
     borderTopWidth: 1,
     borderTopColor: "#ccc",
+    backgroundColor: "#fff",
   },
   input: {
     flex: 1,
-    padding: 10,
-    borderRadius: 20,
+    borderRadius: 25,
     borderWidth: 1,
     borderColor: "#ccc",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     marginRight: 10,
+    backgroundColor: "#fff",
   },
   sendButton: {
-    backgroundColor: "#007BFF",
-    padding: 10,
-    borderRadius: 20,
+    backgroundColor: "#6a0dad", // Purple button
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 25,
+    elevation: 3,
   },
   sendButtonText: {
-    color: "#fff",
+    color: "#fff", // White text
+    fontSize: 15,
     fontWeight: "bold",
   },
 });
+
