@@ -7,6 +7,7 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -34,7 +35,6 @@ const GroupChat: React.FC = () => {
   useEffect(() => {
     const fetchGroupChatDetails = async () => {
       try {
-        // Get auth token and group details from AsyncStorage
         const token = await AsyncStorage.getItem("authToken");
         const storedGroup = await AsyncStorage.getItem("selectedGroup");
 
@@ -44,14 +44,12 @@ const GroupChat: React.FC = () => {
 
         const parsedGroup: Group = JSON.parse(storedGroup);
         setGroup(parsedGroup);
-        setMessages(parsedGroup.messages); // Load existing messages
+        setMessages(parsedGroup.messages);
 
-        // Retrieve current user email from token or AsyncStorage
         const userEmail = await AsyncStorage.getItem("userEmail");
         if (!userEmail) {
           throw new Error("Unable to fetch user email.");
         }
-
         setCurrentUserEmail(userEmail);
       } catch (err: any) {
         setError(err.message || "An unexpected error occurred.");
@@ -72,7 +70,6 @@ const GroupChat: React.FC = () => {
         throw new Error("User is not authenticated.");
       }
 
-      // Send the message to the backend
       const response = await fetch(
         `http://10.0.2.2:8080/groups/${group.id}/send?content=${encodeURIComponent(
           newMessage
@@ -90,16 +87,15 @@ const GroupChat: React.FC = () => {
         throw new Error("Failed to send the message.");
       }
 
-      // Add new message to the messages list
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          senderEmail: currentUserEmail || "Unknown",
+          senderEmail: currentUserEmail || "You",
           content: newMessage,
           timestamp: new Date().toISOString(),
         },
       ]);
-      setNewMessage(""); // Clear the input field
+      setNewMessage("");
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
     }
@@ -107,40 +103,37 @@ const GroupChat: React.FC = () => {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading chat...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>{error}</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#6a0dad" />
+        <Text style={styles.loadingText}>Loading chat...</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>{group?.name}</Text>
+      <Text style={styles.header}>{group?.name}</Text>
+
       <FlatList
         data={messages}
         keyExtractor={(item, index) => index.toString()}
+        contentContainerStyle={styles.messagesContainer}
         renderItem={({ item }) => {
           const isMyMessage = item.senderEmail === currentUserEmail;
           return (
             <View
               style={[
-                styles.messageContainer,
+                styles.messageBox,
                 isMyMessage ? styles.myMessage : styles.otherMessage,
               ]}
             >
               {!isMyMessage && (
                 <Text style={styles.senderEmail}>{item.senderEmail}</Text>
               )}
-              <Text style={styles.content}>{item.content}</Text>
+              {isMyMessage && (
+                <Text style={styles.senderEmail}>You</Text>
+                )}
+              <Text style={styles.messageContent}>{item.content}</Text>
               <Text style={styles.timestamp}>
                 {new Date(item.timestamp).toLocaleString()}
               </Text>
@@ -148,10 +141,11 @@ const GroupChat: React.FC = () => {
           );
         }}
       />
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Type a message"
+          placeholder="Type a message..."
           value={newMessage}
           onChangeText={setNewMessage}
         />
@@ -166,71 +160,90 @@ const GroupChat: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#f9f9f9",
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  messageContainer: {
-    marginBottom: 10,
+    backgroundColor: "#ccccff",
     padding: 10,
-    borderRadius: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#6a0dad",
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#6a0dad",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  messagesContainer: {
+    flexGrow: 1,
+    paddingBottom: 10,
+  },
+  messageBox: {
+    borderRadius: 20,
+    padding: 8,
+    marginVertical: 5,
     maxWidth: "75%",
+    elevation:3,
   },
   myMessage: {
+    backgroundColor: "#f2f2f2",
     alignSelf: "flex-end",
-    backgroundColor: "#d4f8d4",
   },
   otherMessage: {
+    backgroundColor: "#e0e0eb",
     alignSelf: "flex-start",
-    backgroundColor: "#e0e0e0",
   },
   senderEmail: {
-    fontSize: 12,
-    color: "#888",
+    fontSize: 18,
+    color: "#6a0dad",
+    marginBottom: 5,
+    fontWeight: "600",
   },
-  content: {
-    fontSize: 16,
+  messageContent: {
+    fontSize: 18,
     color: "#333",
   },
   timestamp: {
     fontSize: 10,
-    color: "#aaa",
-    marginTop: 5,
+    color: "#888",
+    marginTop: 10,
+    alignSelf: "flex-end",
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 10,
     borderTopWidth: 1,
     borderTopColor: "#ccc",
+    backgroundColor: "#fff",
   },
   input: {
     flex: 1,
-    padding: 10,
-    borderRadius: 20,
+    borderRadius: 25,
     borderWidth: 1,
     borderColor: "#ccc",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     marginRight: 10,
+    backgroundColor: "#fff",
   },
   sendButton: {
-    backgroundColor: "#007BFF",
-    padding: 10,
-    borderRadius: 20,
+    backgroundColor: "#6a0dad",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 25,
+    elevation: 2,
   },
   sendButtonText: {
     color: "#fff",
+    fontSize: 15,
     fontWeight: "bold",
-  },
-  errorText: {
-    color: "red",
-    fontSize: 16,
-    textAlign: "center",
   },
 });
 

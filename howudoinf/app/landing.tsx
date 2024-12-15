@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
@@ -46,8 +46,8 @@ export default function Landing() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#6a0dad" />
         <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
@@ -55,24 +55,34 @@ export default function Landing() {
 
   return (
     <View style={styles.container}>
+      {/* Logout Button at Top Right */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutButtonText}>Logout</Text>
+      </TouchableOpacity>
+
+      {/* Welcome Header */}
       {error ? (
         <Text style={styles.errorText}>{error}</Text>
       ) : (
         <>
-          <Text style={styles.welcomeText}>Welcome! Your token is:</Text>
-          <Text style={styles.tokenText}>{token}</Text>
+          <Text style={styles.welcomeText}>Welcome!</Text>
         </>
       )}
+
+      {/* Groups and Friends Buttons */}
       <View style={styles.buttonContainer}>
-        <View style={styles.button}>
-          <Button title="Groups" onPress={() => router.push("/groups")} />
-        </View>
-        <View style={styles.button}>
-          <Button title="Friends" onPress={() => router.push("/friends")} />
-        </View>
-        <View style={styles.button}>
-          <Button title="Logout" onPress={handleLogout} />
-        </View>
+        <TouchableOpacity
+          style={styles.purpleButton}
+          onPress={() => router.push("/groups")}
+        >
+          <Text style={styles.buttonText}>My Groups</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.purpleButton}
+          onPress={() => router.push("/friends")}
+        >
+          <Text style={styles.buttonText}>My Friends</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -81,21 +91,23 @@ export default function Landing() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#ccccff", // Light lavender background
     padding: 20,
-    backgroundColor: "#f9f9f9",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f3ff",
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 50,
     fontWeight: "bold",
+    color: "#33334d",
+    marginBottom:70,
     textAlign: "center",
-    marginBottom: 10,
-  },
-  tokenText: {
-    fontSize: 16,
-    color: "#333",
-    textAlign: "center",
-    marginVertical: 20,
   },
   errorText: {
     fontSize: 16,
@@ -105,16 +117,39 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: "#666",
-    textAlign: "center",
+    color: "#6a0dad",
     marginTop: 10,
   },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 20,
+  logoutButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    backgroundColor: "#888",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    elevation: 3,
   },
-  button: {
-    width: "30%",
+  logoutButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+  buttonContainer: {
+    marginTop: 20,
+    width: "80%",
+  },
+  purpleButton: {
+    backgroundColor: "#6a0dad",
+    paddingVertical: 15,
+    borderRadius: 25,
+    elevation: 2,
+    marginVertical: 15, // Spacing between buttons
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "600",
   },
 });
