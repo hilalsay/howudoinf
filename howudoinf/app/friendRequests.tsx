@@ -94,22 +94,24 @@ export default function FriendRequests() {
                 ? `From: ${item.senderEmail}`
                 : `To: ${item.receiverEmail}`}
             </Text>
-            {section.title === "Received Requests" && item.status === "PENDING" && (
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.acceptButton}
-                  onPress={() => handleAcceptRequest(item.senderEmail)}
-                >
-                  <Text style={styles.buttonText}>Accept</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.declineButton}
-                  onPress={() => handleDeclineRequest(item.senderEmail)}
-                >
-                  <Text style={styles.buttonText}>Decline</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+            <Text style={styles.statusText}>Status: {item.status}</Text>
+            {section.title === "Received Requests" &&
+              item.status === "PENDING" && (
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={styles.acceptButton}
+                    onPress={() => handleAcceptRequest(item.senderEmail)}
+                  >
+                    <Text style={styles.buttonText}>Accept</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.declineButton}
+                    onPress={() => handleDeclineRequest(item.senderEmail)}
+                  >
+                    <Text style={styles.buttonText}>Decline</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
           </View>
         )}
       />
@@ -130,12 +132,20 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 10,
   },
-  sectionHeader: {
+  sectionHeaderBox: {
+    borderWidth: 2, // Purple border
+    borderColor: "#6a0dad", // Purple color
+    borderRadius: 12, // Rounded corners
+    backgroundColor: "#6a0dad", // Light purple background
+    paddingVertical: 10, // Top and bottom padding
+    paddingHorizontal: 15, // Left and right padding
+    marginVertical: 20, // Spacing between sections
+    alignItems: "flex-start", // Center align text
+  },
+  subHeaderText: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#333",
-    marginTop: 15,
-    marginBottom: 5,
+    color: "#fff", // White text
   },
   requestCard: {
     backgroundColor: "#F1E6FF",
@@ -151,6 +161,11 @@ const styles = StyleSheet.create({
   requestText: {
     fontSize: 16,
     color: "#333",
+  },
+  statusText: {
+    fontSize: 14,
+    color: "#888",
+    marginTop: 5,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -196,19 +211,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 10,
   },
-  sectionHeaderBox: {
-    borderWidth: 2,                // Purple border
-    borderColor: "#6a0dad",        // Purple color
-    borderRadius: 12,              // Rounded corners
-    backgroundColor: "#6a0dad",    // Light purple background
-    paddingVertical: 10,           // Top and bottom padding
-    paddingHorizontal: 15,         // Left and right padding
-    marginVertical: 20,            // Spacing between sections
-    alignItems: "flex-start",          // Center align text
-  },
-  subHeaderText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",                 // Black text
-  }
 });
