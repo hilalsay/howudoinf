@@ -8,7 +8,7 @@ import Messages from "./app/messages";
 import Friends from "./app/friends";
 import Groups from "./app/groups";
 import GroupDetails from "./app/groupdetails";
-import AddFriend from "./app/addfriend";
+import AddFriend from "./app/addFriend";
 import FriendRequests from "./app/friendRequests";
 
 const Stack = createStackNavigator();
