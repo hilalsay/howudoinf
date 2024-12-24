@@ -14,6 +14,7 @@ export default function FriendRequests() {
   const [sentRequests, setSentRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [requests, setRequests] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -56,13 +57,96 @@ export default function FriendRequests() {
   }, []);
 
   const handleAcceptRequest = async (senderEmail: string) => {
-    console.log(`Accepted: ${senderEmail}`);
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      if (!token) {
+        setError("Token is missing. Please log in again.");
+        return;
+      }
+
+      const response = await fetch("http://10.0.2.2:8080/friends/accept", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ senderEmail }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to accept friend request.");
+      }
+
+      // Update the status in the local state
+      setReceivedRequests((prevRequests) =>
+        prevRequests.map((request) =>
+          request.senderEmail === senderEmail
+            ? { ...request, status: "ACCEPTED" }
+            : request
+        )
+      );
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
+    }
   };
 
   const handleDeclineRequest = async (senderEmail: string) => {
-    console.log(`Declined: ${senderEmail}`);
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      if (!token) {
+        setError("Token is missing. Please log in again.");
+        return;
+      }
+
+      const response = await fetch("http://10.0.2.2:8080/friends/reject", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ senderEmail }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to decline friend request.");
+      }
+
+      // Update the status in the local state
+      setReceivedRequests((prevRequests) =>
+        prevRequests.map((request) =>
+          request.senderEmail === senderEmail
+            ? { ...request, status: "REJECTED" }
+            : request
+        )
+      );
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
+    }
   };
 
+  const fetchFriendRequests = async (token: string) => {
+    try {
+      const response = await fetch("http://10.0.2.2:8080/friends/requests", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch friend requests.");
+      }
+
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
+      return [];
+    }
+  };
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -96,7 +180,7 @@ export default function FriendRequests() {
             </Text>
             <Text style={styles.statusText}>Status: {item.status}</Text>
             {section.title === "Received Requests" &&
-              item.status === "PENDING" && (
+              item.status === "PENDING" && ( // Show buttons only for pending requests
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     style={styles.acceptButton}

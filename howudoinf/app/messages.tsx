@@ -11,20 +11,19 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Messages() {
-  const [messages, setMessages] = useState<any[]>([]); // Store messages
-  const [friendEmail, setFriendEmail] = useState<string | null>(null); // Store friend email
-  const [loading, setLoading] = useState<boolean>(true); // Track loading state
-  const [error, setError] = useState<string | null>(null); // Track error state
-  const [userEmail, setUserEmail] = useState<string | null>(null); // Store current user's email
-  const [newMessage, setNewMessage] = useState<string>(""); // Store new message input
+  const [messages, setMessages] = useState<any[]>([]);
+  const [friendEmail, setFriendEmail] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [newMessage, setNewMessage] = useState<string>("");
 
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        // Retrieve the user's token, email, and friend's email
         const token = await AsyncStorage.getItem("authToken");
         const email = await AsyncStorage.getItem("friendEmail");
-        const userEmail = await AsyncStorage.getItem("userEmail"); // Retrieve current user's email
+        const userEmail = await AsyncStorage.getItem("userEmail");
 
         if (!token || !email || !userEmail) {
           setError("No token or email found.");
@@ -32,16 +31,15 @@ export default function Messages() {
           return;
         }
 
-        setUserEmail(userEmail); // Set the current user's email
-        setFriendEmail(email); // Set the friend's email
+        setUserEmail(userEmail);
+        setFriendEmail(email);
 
-        // Make the GET request to fetch messages
         const response = await fetch(
           `http://10.0.2.2:8080/messages?userEmail2=${email}`,
           {
             method: "GET",
             headers: {
-              Authorization: `Bearer ${token}`, // Send the token in the Authorization header
+              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }
@@ -53,7 +51,6 @@ export default function Messages() {
 
         const data = await response.json();
 
-        // If the response is an array, set the messages
         if (Array.isArray(data)) {
           setMessages(data);
         } else {
@@ -70,10 +67,9 @@ export default function Messages() {
   }, []);
 
   const sendMessage = async () => {
-    if (!newMessage.trim()) return; // Do not send empty messages
+    if (!newMessage.trim()) return;
 
     try {
-      // Retrieve the user's token and friend's email
       const token = await AsyncStorage.getItem("authToken");
       const email = await AsyncStorage.getItem("friendEmail");
 
@@ -82,17 +78,15 @@ export default function Messages() {
         return;
       }
 
-      // Prepare message data
       const messageData = {
         receiverEmail: email,
         content: newMessage,
       };
 
-      // Send the message via POST request
       const response = await fetch("http://10.0.2.2:8080/messages/send", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // Send the token in the Authorization header
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(messageData),
@@ -102,28 +96,28 @@ export default function Messages() {
         throw new Error("Failed to send message.");
       }
 
-      // Handle plain text response (e.g., "Message sent successfully")
-      const responseText = await response.text(); // Get the response as text
-
-      // Optionally, you can log or display the response message if needed
-      console.log(responseText); // For debugging
-
-      // Since the message was successfully sent, update the message list
       const newMessageResponse = {
         senderEmail: userEmail,
         receiverEmail: email,
         content: newMessage,
+        timestamp: new Date().toISOString(),
       };
 
-      // Add the new message to the list of messages
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        newMessageResponse, // Assuming response contains the sent message
-      ]);
-      setNewMessage(""); // Clear the input field
+      setMessages((prevMessages) => [...prevMessages, newMessageResponse]);
+      setNewMessage("");
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
     }
+  };
+
+  const formatTimestamp = (isoString: string) => {
+    const date = new Date(isoString);
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
 
   return (
@@ -132,14 +126,14 @@ export default function Messages() {
         Messages with: {friendEmail ? friendEmail : "Unknown User"}
       </Text>
 
-      {/* Messages section */}
       <View style={styles.messagesContainer}>
-        {messages.length > 0 ? (
+        {loading ? (
+          <ActivityIndicator size="large" color="#6a0dad" />
+        ) : messages.length > 0 ? (
           <FlatList
             data={messages}
             keyExtractor={(item, index) => item.id || index.toString()}
             renderItem={({ item }) => {
-              // Determine if the current user is the sender or receiver
               const isSender = item.senderEmail === userEmail;
 
               return (
@@ -149,11 +143,11 @@ export default function Messages() {
                     isSender ? styles.senderMessage : styles.receiverMessage,
                   ]}
                 >
-                     {!isSender && (
-        <Text style={styles.senderEmail}>{item.senderEmail}</Text>
-      )}
-      <Text style={styles.messageText}>{item.content}</Text>
-    </View>
+                  <Text style={styles.messageText}>{item.content}</Text>
+                  <Text style={styles.timestamp}>
+                    {formatTimestamp(item.timestamp)}
+                  </Text>
+                </View>
               );
             }}
           />
@@ -162,7 +156,6 @@ export default function Messages() {
         )}
       </View>
 
-      {/* Input and Send Message Section */}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -181,13 +174,13 @@ export default function Messages() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ccccff", // Light lavender background
+    backgroundColor: "#ccccff",
     padding: 10,
   },
   headerText: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#6a0dad", // Purple text
+    color: "#6a0dad",
     textAlign: "center",
     marginBottom: 10,
   },
@@ -199,31 +192,30 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     marginVertical: 5,
-    maxWidth: "75%", // Messages won't span full width
-    elevation: 3, // Shadow for depth
+    maxWidth: "75%",
+    elevation: 3,
   },
   senderMessage: {
-    backgroundColor: "#f2f2f2", // Light gray for sender
-    alignSelf: "flex-end", // Align to the right
+    backgroundColor: "#f2f2f2",
+    alignSelf: "flex-end",
   },
   receiverMessage: {
-    backgroundColor: "#e0e0eb", // Light purple for receiver
-    alignSelf: "flex-start", // Align to the left
-  },
-  senderEmail: {
-    fontSize: 14,
-    color: "#6a0dad", // Purple for sender email
-    fontWeight: "600",
-    marginBottom: 2,
-    textAlign: "right",
+    backgroundColor: "#e0e0eb",
+    alignSelf: "flex-start",
   },
   messageText: {
     fontSize: 16,
-    color: "#333", // Darker text color for message content
+    color: "#333",
+  },
+  timestamp: {
+    fontSize: 12,
+    color: "#888",
+    marginTop: 5,
+    alignSelf: "flex-end",
   },
   noMessagesText: {
     fontSize: 16,
-    color: "#6a0dad", // Purple for no messages
+    color: "#6a0dad",
     textAlign: "center",
     marginTop: 20,
   },
@@ -246,16 +238,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   sendButton: {
-    backgroundColor: "#6a0dad", // Purple button
+    backgroundColor: "#6a0dad",
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 25,
     elevation: 3,
   },
   sendButtonText: {
-    color: "#fff", // White text
+    color: "#fff",
     fontSize: 15,
     fontWeight: "bold",
   },
 });
-
